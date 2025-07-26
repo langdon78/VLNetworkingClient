@@ -161,7 +161,7 @@ struct NetworkClientTests {
         )
         
         // Act
-        let response: NetworkResponse<TestUser> = try await client.request(config)
+        let response: NetworkResponse<TestUser> = try await client.requestWithDecoder(config)
         
         // Assert
         #expect(response.data == testUser)
@@ -578,7 +578,7 @@ struct RetryLogicTests {
         )
         
         // Act
-        let response: NetworkResponse<TestUser> = try await retryClient.request(config)
+        let response: NetworkResponse<TestUser> = try await retryClient.requestWithDecoder(config)
         
         // Assert
         #expect(response.data == testUser)
@@ -612,7 +612,7 @@ struct RetryLogicTests {
                 url: testURL,
                 method: .GET
             )
-            let _: NetworkResponse<TestUser> = try await client.request(config)
+            let _: NetworkResponse<TestUser> = try await client.requestWithDecoder(config)
         }
     }
     
@@ -668,7 +668,7 @@ struct RetryLogicTests {
                 url: testURL,
                 method: .GET
             )
-            let _: NetworkResponse<TestUser> = try await client.request(config)
+            let _: NetworkResponse<TestUser> = try await client.requestWithDecoder(config)
         }
         
         // Should only be called once (no retries for client errors)

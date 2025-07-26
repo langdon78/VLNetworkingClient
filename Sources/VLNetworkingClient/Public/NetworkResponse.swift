@@ -28,16 +28,16 @@ import Foundation
 /// ```
 public struct NetworkResponse<T: Sendable>: @unchecked Sendable {
     /// The parsed response data, if available.
-    let data: T?
+    public let data: T?
     
     /// The underlying HTTP response object.
-    let response: HTTPURLResponse
+    public let response: HTTPURLResponse
     
     /// The HTTP status code from the response.
-    let statusCode: Int
+    public let statusCode: Int
     
     /// All HTTP headers from the response.
-    let headers: [AnyHashable: Any]
+    public let headers: [AnyHashable: Any]
     
     /// Creates a new network response.
     /// - Parameters:
