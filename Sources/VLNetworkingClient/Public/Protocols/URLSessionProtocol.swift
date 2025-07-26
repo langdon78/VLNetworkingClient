@@ -12,9 +12,3 @@ public protocol URLSessionProtocol: Sendable {
     func upload(for: URLRequest, fromFile: URL) async throws -> (Data, URLResponse)
     func download(for: URLRequest, delegate: (any URLSessionTaskDelegate)?) async throws -> (URL, URLResponse)
 }
-
-extension URLSession: URLSessionProtocol {
-    static var `default`: URLSessionProtocol {
-        Self.shared
-    }
-}

@@ -35,7 +35,7 @@ public final actor AsyncNetworkClient: AsyncNetworkClientProtocol {
     ///   - session: The URL session to use for network requests.
     ///   - interceptorChain: The interceptor chain for processing requests and responses. Defaults to an empty chain.
     public init(
-        session: URLSessionProtocol,
+        session: URLSessionProtocol = URLSession.shared,
         interceptorChain: InterceptorChain = InterceptorChain()
     ) {
         self.session = session
