@@ -4,21 +4,22 @@
 import PackageDescription
 
 let package = Package(
-    name: "DiscogsAPIClient",
+    name: "VLNetworkingClient",
+    platforms: [.macOS(.v13), .iOS(.v16), .tvOS(.v16), .watchOS(.v6), .visionOS(.v1)],
     products: [
         // Products define the executables and libraries a package produces, making them visible to other packages.
         .library(
-            name: "DiscogsAPIClient",
-            targets: ["DiscogsAPIClient"]),
+            name: "VLNetworkingClient",
+            targets: ["VLNetworkingClient"]),
     ],
     targets: [
         // Targets are the basic building blocks of a package, defining a module or a test suite.
         // Targets can depend on other targets in this package and products from dependencies.
         .target(
-            name: "DiscogsAPIClient"),
+            name: "VLNetworkingClient"),
         .testTarget(
-            name: "DiscogsAPIClientTests",
-            dependencies: ["DiscogsAPIClient"]
+            name: "VLNetworkingClientTests",
+            dependencies: ["VLNetworkingClient"]
         ),
     ]
 )
