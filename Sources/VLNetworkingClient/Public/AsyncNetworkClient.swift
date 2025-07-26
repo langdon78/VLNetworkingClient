@@ -64,7 +64,7 @@ public final actor AsyncNetworkClient: AsyncNetworkClientProtocol {
     ///   - decoder: The decoder to use for parsing the response body. Defaults to `JSONDecoder()`.
     /// - Returns: A `NetworkResponse` containing the decoded data and HTTP response.
     /// - Throws: `NetworkError` for various network and decoding failures.
-    public func request<T: Codable>(
+    public func requestWithDecoder<T: Codable>(
         _ config: RequestConfiguration,
         decoder: ResponseBodyDecoder = JSONDecoder()
     ) async throws -> NetworkResponse<T> {
@@ -263,7 +263,7 @@ extension AsyncNetworkClient {
             headers: headers,
             body: bodyData
         )
-        return try await request(config)
+        return try await requestWithDecoder(config)
     }
     
     /// Convenience method for making GET requests.
@@ -282,7 +282,7 @@ extension AsyncNetworkClient {
             method: .GET,
             headers: headers
         )
-        return try await request(config)
+        return try await requestWithDecoder(config)
     }
     
     /// Convenience method for making PUT requests with JSON bodies.
@@ -307,7 +307,7 @@ extension AsyncNetworkClient {
             headers: headers,
             body: bodyData
         )
-        return try await request(config)
+        return try await requestWithDecoder(config)
     }
     
     /// Convenience method for making DELETE requests.

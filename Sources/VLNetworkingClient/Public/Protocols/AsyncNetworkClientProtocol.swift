@@ -21,7 +21,7 @@ public protocol AsyncNetworkClientProtocol: Actor {
     ///   - decoder: The decoder for parsing the response body.
     /// - Returns: A network response containing the decoded data.
     /// - Throws: Network or decoding errors.
-    func request<T: Codable>(
+    func requestWithDecoder<T: Codable>(
         _ config: RequestConfiguration,
         decoder: ResponseBodyDecoder
     ) async throws -> NetworkResponse<T>
