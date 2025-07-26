@@ -6,7 +6,7 @@
 //
 import Foundation
 
-protocol URLSessionProtocol: Sendable {
+public protocol URLSessionProtocol: Sendable {
     @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, *)
     func data(for request: URLRequest, delegate: (any URLSessionTaskDelegate)?) async throws -> (Data, URLResponse)
     func upload(for: URLRequest, fromFile: URL) async throws -> (Data, URLResponse)

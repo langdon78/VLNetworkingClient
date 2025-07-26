@@ -7,7 +7,6 @@
 
 import Foundation
 
-// MARK: - RequestInterceptor Protocol
 public protocol RequestInterceptor: Sendable {
     /// Called before a request is sent
     func intercept(_ request: URLRequest) async throws -> URLRequest

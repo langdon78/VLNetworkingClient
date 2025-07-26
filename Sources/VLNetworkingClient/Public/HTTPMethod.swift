@@ -8,7 +8,7 @@
 import Foundation
 
 // MARK: - HTTP Method
-enum HTTPMethod: String, Sendable {
+public enum HTTPMethod: String, Sendable {
     case GET = "GET"
     case POST = "POST"
     case PUT = "PUT"
@@ -17,7 +17,7 @@ enum HTTPMethod: String, Sendable {
 }
 
 extension HTTPMethod: CustomStringConvertible {
-    var description: String {
+    public var description: String {
         rawValue
     }
 }

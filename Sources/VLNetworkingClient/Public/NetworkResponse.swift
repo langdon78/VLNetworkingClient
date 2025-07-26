@@ -43,7 +43,7 @@ public struct NetworkResponse<T: Sendable>: @unchecked Sendable {
     /// - Parameters:
     ///   - data: The parsed response data.
     ///   - response: The HTTP response object.
-    init(data: T?, response: HTTPURLResponse) {
+    public init(data: T?, response: HTTPURLResponse) {
         self.data = data
         self.response = response
         self.statusCode = response.statusCode

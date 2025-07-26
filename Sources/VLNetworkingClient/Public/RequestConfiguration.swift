@@ -25,13 +25,13 @@ import Foundation
 /// )
 /// ```
 public struct RequestConfiguration: Sendable {
-    let url: URL
-    let method: HTTPMethod
-    let headers: [String: String]
-    var body: Data?
-    let timeoutInterval: TimeInterval
-    let retryCount: Int
-    let retryDelay: TimeInterval
+    public let url: URL
+    public let method: HTTPMethod
+    public let headers: [String: String]
+    public var body: Data?
+    public let timeoutInterval: TimeInterval
+    public let retryCount: Int
+    public let retryDelay: TimeInterval
     
     /// Creates a new request configuration.
     /// 
@@ -43,7 +43,7 @@ public struct RequestConfiguration: Sendable {
     ///   - timeoutInterval: Request timeout in seconds. Defaults to 30.0.
     ///   - retryCount: Number of retry attempts. Defaults to 3.
     ///   - retryDelay: Initial delay between retries in seconds. Defaults to 0.1.
-    init(
+    public init(
         url: URL,
         method: HTTPMethod = .GET,
         headers: [String: String] = Self.defaultHeaders,
@@ -68,7 +68,7 @@ public struct RequestConfiguration: Sendable {
     ///   - encoder: The encoder to use. Defaults to `JSONEncoder()`.
     /// - Returns: A new configuration with the encoded body.
     /// - Throws: Encoding errors from the encoder.
-    func withEncodableBody<
+    public func withEncodableBody<
         RequestPayload: Encodable,
         Encoder: RequestBodyEncoder
     >(
@@ -82,7 +82,7 @@ public struct RequestConfiguration: Sendable {
 }
 
 extension RequestConfiguration {
-    static let defaultHeaders: [String: String] =
+    public static let defaultHeaders: [String: String] =
         [
             "Content-Type": "application/json",
             "Accept": "application/json",
@@ -90,7 +90,7 @@ extension RequestConfiguration {
         ]
     
     /// Converts the configuration to a `URLRequest`.
-    var urlRequest: URLRequest {
+    public var urlRequest: URLRequest {
         var request = URLRequest(url: url)
         request.httpMethod = method.description
         request.httpBody = body
