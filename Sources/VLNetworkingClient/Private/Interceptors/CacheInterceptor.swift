@@ -1,13 +1,13 @@
 //
 //  CachedInterceptor.swift
-//  DiscogsAPIClient
+//  VLNetworkingClient
 //
 //  Created by James Langdon on 7/15/25.
 //
 
 import Foundation
 
-final actor CacheInterceptor: RequestInterceptor {
+final actor CacheInterceptor: Interceptor {
     private let cache = NSCache<NSString, CachedResponse>()
     private let cachePolicy: CachePolicy
     
@@ -20,7 +20,7 @@ final actor CacheInterceptor: RequestInterceptor {
         if request.httpMethod == "GET" || request.httpMethod == nil {
             if let cachedResponse = getCachedResponse(for: request) {
                 // Return cached data by throwing a special error that includes the cached response
-                throw RequestInterceptorError.cached(cachedResponse.data)
+                throw InterceptorError.cached(cachedResponse.data)
             }
         }
         

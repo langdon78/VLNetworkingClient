@@ -1,6 +1,6 @@
 //
 //  InterceptorChain.swift
-//  DiscogsAPIClient
+//  VLNetworkingClient
 //
 //  Created by James Langdon on 7/14/25.
 //
@@ -9,13 +9,13 @@ import Foundation
 
 // MARK: - Interceptor Chain Manager
 public final actor InterceptorChain: InterceptorChainProtocol {
-    private var interceptors: [RequestInterceptor]
+    private var interceptors: [Interceptor]
     
-    public init(interceptors: [RequestInterceptor] = []) {
+    public init(interceptors: [Interceptor] = []) {
         self.interceptors = interceptors
     }
     
-    public func add(_ interceptor: RequestInterceptor) async {
+    public func add(_ interceptor: Interceptor) async {
         interceptors.append(interceptor)
     }
     

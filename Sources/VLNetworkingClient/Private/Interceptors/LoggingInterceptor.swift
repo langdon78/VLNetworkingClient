@@ -1,13 +1,13 @@
 //
 //  LoggingInterceptor.swift
-//  HttpClient
+//  VLNetworkingClient
 //
 //  Created by James Langdon on 7/15/25.
 //
 
 import Foundation
 
-final actor LoggingInterceptor: RequestInterceptor {
+final actor LoggingInterceptor: Interceptor {
     private let logger: Logger
     
     init(logger: Logger) {

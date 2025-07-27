@@ -1,6 +1,6 @@
 //
 //  CachedResponse.swift
-//  DiscogsAPIClient
+//  VLNetworkingClient
 //
 //  Created by James Langdon on 7/15/25.
 //

@@ -1,16 +1,16 @@
 //
-//  InterceptorChainFactory.swift
-//  HttpClient
+//  InterceptorFactory.swift
+//  VLNetworkingClient
 //
 //  Created by James Langdon on 7/16/25.
 //
 
 import Foundation
 
-public struct InterceptorChainFactory {
+public struct InterceptorFactory {
     public static func make(
-        configuration: IntercepterChainConfiguration
-    ) -> any RequestInterceptor {
+        configuration: IntercepterConfiguration
+    ) -> any Interceptor {
         switch configuration {
         case .authentication(tokenManager: let tokenManager):
             return AuthenticationInterceptor(tokenManager: tokenManager)
@@ -23,7 +23,7 @@ public struct InterceptorChainFactory {
         }
     }
     
-    public enum IntercepterChainConfiguration {
+    public enum IntercepterConfiguration {
         case authentication(tokenManager: TokenManager)
         case logging(logger: Logger)
         case rateLimit(maxRequestsPerMinute: Int)

@@ -1,13 +1,13 @@
 //
 //  RateLimitInterceptor.swift
-//  DiscogsAPIClient
+//  VLNetworkingClient
 //
 //  Created by James Langdon on 7/15/25.
 //
 
 import Foundation
 
-actor RateLimitInterceptor: RequestInterceptor {
+actor RateLimitInterceptor: Interceptor {
     private let maxRequestsPerMinute: Int
     private var requestTimes: [Date] = []
     

@@ -1,6 +1,6 @@
 //
 //  AsyncClientTests.swift
-//  HttpClient
+//  VLNetworkingClient
 //
 //  Created by James Langdon on 7/16/25.
 //
@@ -161,7 +161,7 @@ struct NetworkClientTests {
         )
         
         // Act
-        let response: NetworkResponse<TestUser> = try await client.requestWithDecoder(config)
+        let response: NetworkResponse<TestUser> = try await client.request(config)
         
         // Assert
         #expect(response.data == testUser)
@@ -212,7 +212,7 @@ struct NetworkClientTests {
         let config = RequestConfiguration(url: testURL, method: .GET)
         
         // Act
-        let response = try await client.request(config)
+        let response = try await client.requestRawData(for: config)
         
         // Assert
         #expect(response.data == testData)
@@ -578,7 +578,7 @@ struct RetryLogicTests {
         )
         
         // Act
-        let response: NetworkResponse<TestUser> = try await retryClient.requestWithDecoder(config)
+        let response: NetworkResponse<TestUser> = try await retryClient.request(config)
         
         // Assert
         #expect(response.data == testUser)
@@ -612,7 +612,7 @@ struct RetryLogicTests {
                 url: testURL,
                 method: .GET
             )
-            let _: NetworkResponse<TestUser> = try await client.requestWithDecoder(config)
+            let _: NetworkResponse<TestUser> = try await client.request(config)
         }
     }
     
@@ -668,7 +668,7 @@ struct RetryLogicTests {
                 url: testURL,
                 method: .GET
             )
-            let _: NetworkResponse<TestUser> = try await client.requestWithDecoder(config)
+            let _: NetworkResponse<TestUser> = try await client.request(config)
         }
         
         // Should only be called once (no retries for client errors)

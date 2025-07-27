@@ -1,6 +1,6 @@
 //
 //  AsyncClient.swift
-//  DiscogsAPIClient
+//  VLNetworkingClient
 //
 //  Created by James Langdon on 7/14/25.
 //
@@ -49,7 +49,7 @@ public final actor AsyncNetworkClient: AsyncNetworkClientProtocol {
     /// 
     /// - Parameter interceptor: The interceptor to add to the chain.
     /// - Returns: The same client instance with the interceptor added.
-    public func with<T>(interceptor: T) async -> Self where T: RequestInterceptor {
+    public func with<T>(interceptor: T) async -> Self where T: Interceptor {
         let updatedSelf = self
         await updatedSelf.interceptorChain.add(interceptor)
         return updatedSelf
@@ -64,11 +64,11 @@ public final actor AsyncNetworkClient: AsyncNetworkClientProtocol {
     ///   - decoder: The decoder to use for parsing the response body. Defaults to `JSONDecoder()`.
     /// - Returns: A `NetworkResponse` containing the decoded data and HTTP response.
     /// - Throws: `NetworkError` for various network and decoding failures.
-    public func requestWithDecoder<T: Codable>(
-        _ config: RequestConfiguration,
-        decoder: ResponseBodyDecoder = JSONDecoder()
+    public func request<T: Codable>(
+        for config: RequestConfiguration,
+        with decoder: ResponseBodyDecoder = JSONDecoder()
     ) async throws -> NetworkResponse<T> {
-        let networkResponse = try await request(config)
+        let networkResponse = try await requestRawData(for: config)
         let (data, response) = (networkResponse.data, networkResponse.response)
         
         do {
@@ -87,8 +87,8 @@ public final actor AsyncNetworkClient: AsyncNetworkClientProtocol {
     /// - Parameter config: The request configuration containing URL, method, headers, and other settings.
     /// - Returns: A `NetworkResponse` containing the raw data and HTTP response.
     /// - Throws: `NetworkError` for various network failures.
-    public func request(
-        _ config: RequestConfiguration
+    public func requestRawData(
+        for config: RequestConfiguration
     ) async throws -> NetworkResponse<Data> {
         try await withRetry(config.retryCount, delay: config.retryDelay) {
             try await performRequest(request: config.urlRequest)
@@ -152,7 +152,7 @@ public final actor AsyncNetworkClient: AsyncNetworkClientProtocol {
         var interceptedRequest: URLRequest
         do {
             interceptedRequest = try await interceptorChain.interceptRequest(request)
-        } catch RequestInterceptorError.cached(let cachedData) {
+        } catch InterceptorError.cached(let cachedData) {
             return NetworkResponse(data: cachedData, response: HTTPURLResponse(url: request.url!, statusCode: 200, httpVersion: nil, headerFields: nil)!)
         }
         
@@ -263,7 +263,7 @@ extension AsyncNetworkClient {
             headers: headers,
             body: bodyData
         )
-        return try await requestWithDecoder(config)
+        return try await request(config)
     }
     
     /// Convenience method for making GET requests.
@@ -282,7 +282,7 @@ extension AsyncNetworkClient {
             method: .GET,
             headers: headers
         )
-        return try await requestWithDecoder(config)
+        return try await request(config)
     }
     
     /// Convenience method for making PUT requests with JSON bodies.
@@ -307,7 +307,7 @@ extension AsyncNetworkClient {
             headers: headers,
             body: bodyData
         )
-        return try await requestWithDecoder(config)
+        return try await request(config)
     }
     
     /// Convenience method for making DELETE requests.
@@ -326,6 +326,6 @@ extension AsyncNetworkClient {
             method: .DELETE,
             headers: headers
         )
-        return try await request(config)
+        return try await requestRawData(for: config)
     }
 }

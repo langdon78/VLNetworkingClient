@@ -1,13 +1,13 @@
 //
 //  AuthenticationInterceptor.swift
-//  DiscogsAPIClient
+//  VLNetworkingClient
 //
 //  Created by James Langdon on 7/15/25.
 //
 
 import Foundation
 
-final class AuthenticationInterceptor: RequestInterceptor {
+final class AuthenticationInterceptor: Interceptor {
     
     private let tokenManager: TokenManager
     
@@ -32,7 +32,7 @@ final class AuthenticationInterceptor: RequestInterceptor {
            httpResponse.statusCode == 401 {
             try await tokenManager.refreshToken()
             // Could throw a custom error to trigger request retry
-            throw RequestInterceptorError.shouldRetryRequest
+            throw InterceptorError.shouldRetryRequest
         }
         return data
     }

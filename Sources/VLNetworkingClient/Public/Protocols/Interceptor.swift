@@ -1,13 +1,13 @@
 //
 //  RequestInterceptor.swift
-//  DiscogsAPIClient
+//  VLNetworkingClient
 //
 //  Created by James Langdon on 7/14/25.
 //
 
 import Foundation
 
-public protocol RequestInterceptor: Sendable {
+public protocol Interceptor: Sendable {
     /// Called before a request is sent
     func intercept(_ request: URLRequest) async throws -> URLRequest
     
@@ -15,10 +15,10 @@ public protocol RequestInterceptor: Sendable {
     func intercept(_ response: URLResponse, data: Data?) async throws -> Data?
 }
 
-public enum RequestInterceptorError: Error {
+public enum InterceptorError: Error {
     case cancelled
     case cached(Data)
     case shouldRetryRequest
 }
 
-extension RequestInterceptorError: Equatable {}
+extension InterceptorError: Equatable {}

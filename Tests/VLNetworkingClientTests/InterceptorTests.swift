@@ -1,6 +1,6 @@
 //
 //  InterceptorTests.swift
-//  HttpClient
+//  VLNetworkingClient
 //
 //  Created by James Langdon on 7/26/25.
 //
@@ -58,7 +58,7 @@ struct AuthenticationInterceptorTests {
         )!
         let data = "mock-data".data(using: .utf8)!
 
-        await #expect(throws: RequestInterceptorError.shouldRetryRequest) {
+        await #expect(throws: InterceptorError.shouldRetryRequest) {
             try await authInterceptor.intercept(originalResponse, data: data)
         }
     }
@@ -109,7 +109,7 @@ struct CacheInterceptorTests {
         
         _ = try await cacheInterceptor.intercept(httpResponse, data: mockData)
         
-        await #expect(throws: RequestInterceptorError.cached(mockData)) {
+        await #expect(throws: InterceptorError.cached(mockData)) {
             try await cacheInterceptor.intercept(request)
         }
     }
@@ -230,7 +230,7 @@ struct CacheInterceptorTests {
         
         _ = try await cacheInterceptor.intercept(httpResponse, data: mockData)
         
-        await #expect(throws: RequestInterceptorError.cached(mockData)) {
+        await #expect(throws: InterceptorError.cached(mockData)) {
             try await cacheInterceptor.intercept(request)
         }
     }

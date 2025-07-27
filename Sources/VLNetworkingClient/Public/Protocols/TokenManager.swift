@@ -1,6 +1,6 @@
 //
 //  TokenManager.swift
-//  HttpClient
+//  VLNetworkingClient
 //
 //  Created by James Langdon on 7/15/25.
 //

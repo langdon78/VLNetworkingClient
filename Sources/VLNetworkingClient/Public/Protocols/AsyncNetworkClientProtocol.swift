@@ -1,6 +1,6 @@
 //
 //  NetworkClientProtocol.swift
-//  HttpClient
+//  VLNetworkingClient
 //
 //  Created by James Langdon on 7/16/25.
 //
@@ -21,17 +21,17 @@ public protocol AsyncNetworkClientProtocol: Actor {
     ///   - decoder: The decoder for parsing the response body.
     /// - Returns: A network response containing the decoded data.
     /// - Throws: Network or decoding errors.
-    func requestWithDecoder<T: Codable>(
-        _ config: RequestConfiguration,
-        decoder: ResponseBodyDecoder
+    func request<T: Codable>(
+        for config: RequestConfiguration,
+        with decoder: ResponseBodyDecoder
     ) async throws -> NetworkResponse<T>
     
     /// Performs a network request and returns raw response data.
     /// - Parameter config: The request configuration.
     /// - Returns: A network response containing raw data.
     /// - Throws: Network errors.
-    func request(
-        _ config: RequestConfiguration
+    func requestRawData(
+        for config: RequestConfiguration
     ) async throws -> NetworkResponse<Data>
     
     /// Downloads a file to the specified destination.
@@ -55,4 +55,12 @@ public protocol AsyncNetworkClientProtocol: Actor {
         _ config: RequestConfiguration,
         from fileURL: URL
     ) async throws -> NetworkResponse<Data>
+}
+
+extension AsyncNetworkClientProtocol {
+    public func request<T: Codable>(
+        _ config: RequestConfiguration
+    ) async throws -> NetworkResponse<T> {
+        try await request(for: config, with: JSONDecoder())
+    }
 }
