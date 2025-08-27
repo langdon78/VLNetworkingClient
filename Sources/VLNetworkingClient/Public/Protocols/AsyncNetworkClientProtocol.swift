@@ -21,7 +21,7 @@ public protocol AsyncNetworkClientProtocol: Actor {
     ///   - decoder: The decoder for parsing the response body.
     /// - Returns: A network response containing the decoded data.
     /// - Throws: Network or decoding errors.
-    func request<T: Codable>(
+    func request<T: Codable & Sendable>(
         for config: RequestConfiguration,
         with decoder: ResponseBodyDecoder
     ) async throws -> NetworkResponse<T>
@@ -58,7 +58,7 @@ public protocol AsyncNetworkClientProtocol: Actor {
 }
 
 extension AsyncNetworkClientProtocol {
-    public func request<T: Codable>(
+    public func request<T: Codable & Sendable>(
         _ config: RequestConfiguration
     ) async throws -> NetworkResponse<T> {
         try await request(for: config, with: JSONDecoder())

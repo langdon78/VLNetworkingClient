@@ -64,7 +64,7 @@ public final actor AsyncNetworkClient: AsyncNetworkClientProtocol {
     ///   - decoder: The decoder to use for parsing the response body. Defaults to `JSONDecoder()`.
     /// - Returns: A `NetworkResponse` containing the decoded data and HTTP response.
     /// - Throws: `NetworkError` for various network and decoding failures.
-    public func request<T: Codable>(
+    public func request<T: Codable & Sendable>(
         for config: RequestConfiguration,
         with decoder: ResponseBodyDecoder = JSONDecoder()
     ) async throws -> NetworkResponse<T> {
