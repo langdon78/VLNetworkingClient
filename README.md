@@ -26,7 +26,7 @@ Add VLNetworkingClient to your project using Swift Package Manager:
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/yourusername/VLNetworkingClient.git", from: "1.0.0")
+    .package(url: "https://github.com/langdon78/VLNetworkingClient.git", from: "0.1.0")
 ]
 ```
 
