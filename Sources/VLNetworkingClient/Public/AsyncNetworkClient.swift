@@ -29,6 +29,7 @@ import Foundation
 public final actor AsyncNetworkClient: AsyncNetworkClientProtocol {
     private let session: URLSessionProtocol
     private let interceptorChain: InterceptorChainProtocol
+    private let logger: Logger
     
     /// Creates a new network client with the specified session and interceptor chain.
     /// - Parameters:
@@ -36,10 +37,12 @@ public final actor AsyncNetworkClient: AsyncNetworkClientProtocol {
     ///   - interceptorChain: The interceptor chain for processing requests and responses. Defaults to an empty chain.
     public init(
         session: URLSessionProtocol = URLSession.shared,
-        interceptorChain: InterceptorChain = InterceptorChain()
+        interceptorChain: InterceptorChain = InterceptorChain(),
+        logger: Logger = DefaultLogger()
     ) {
         self.session = session
         self.interceptorChain = interceptorChain
+        self.logger = logger
     }
     
     /// Adds an interceptor to the client's interceptor chain.
@@ -203,6 +206,9 @@ public final actor AsyncNetworkClient: AsyncNetworkClientProtocol {
         var lastError: Error?
         
         for attempt in 0...maxRetries {
+            if attempt > 0 {
+                logger.debug("Retrying network request... Attempt \(attempt + 1) of \(maxRetries)")
+            }
             do {
                 return try await operation()
             } catch {
