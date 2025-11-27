@@ -114,3 +114,11 @@ extension NetworkError: Equatable {
         }
     }
 }
+
+public enum InterceptorError: Error {
+    case cancelled
+    case cached(Data)
+    case shouldRetryRequest
+}
+
+extension InterceptorError: Equatable {}

@@ -14,11 +14,3 @@ public protocol Interceptor: Sendable {
     /// Called after a response is received (optional)
     func intercept(_ response: URLResponse, data: Data?) async throws -> Data?
 }
-
-public enum InterceptorError: Error {
-    case cancelled
-    case cached(Data)
-    case shouldRetryRequest
-}
-
-extension InterceptorError: Equatable {}
