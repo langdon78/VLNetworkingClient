@@ -230,15 +230,18 @@ public final actor AsyncNetworkClient: AsyncNetworkClientProtocol {
     
     private func shouldNotRetry(error: Error) -> Bool {
         switch error {
-        case NetworkError.forbidden,
+        case
+            NetworkError.forbidden,
             NetworkError.notFound,
             NetworkError.decodingError,
-            NetworkError.unauthorized:
+            NetworkError.unauthorized,
+            InterceptorError.cancelled,
+            URLError.badURL,
+            URLError.unsupportedURL,
+            URLError.cancelled:
             return true
         case let NetworkError.httpError(statusCode, _):
             return statusCode >= 400 && statusCode < 500 // Client errors
-        case URLError.badURL, URLError.unsupportedURL, URLError.cancelled:
-            return true
         default:
             return false
         }
