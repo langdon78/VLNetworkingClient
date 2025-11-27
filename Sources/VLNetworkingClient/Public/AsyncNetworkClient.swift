@@ -205,9 +205,9 @@ public final actor AsyncNetworkClient: AsyncNetworkClientProtocol {
     ) async throws -> T {
         var lastError: Error?
         
-        for attempt in 0...maxRetries {
-            if attempt > 0 {
-                logger.debug("Retrying network request... Attempt \(attempt + 1) of \(maxRetries)")
+        for attempt in 1...maxRetries {
+            if attempt > 1 {
+                logger.debug("Retrying network request... Attempt \(attempt) of \(maxRetries)")
             }
             do {
                 return try await operation()
@@ -220,7 +220,7 @@ public final actor AsyncNetworkClient: AsyncNetworkClientProtocol {
                 }
                 
                 // Wait before retrying with exponential backoff
-                let retryDelay = delay * Double(attempt + 1)
+                let retryDelay = delay * Double(attempt)
                 try await Task.sleep(nanoseconds: UInt64(retryDelay * 1_000_000_000))
             }
         }
