@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import VLDebugLogger
 
 public struct InterceptorFactory {
     public static func make(
@@ -25,7 +26,7 @@ public struct InterceptorFactory {
     
     public enum IntercepterConfiguration {
         case authentication(tokenManager: TokenManager)
-        case logging(logger: Logger)
+        case logging(logger: VLDebugLogger = VLDebugLogger.shared)
         case rateLimit(maxRequestsPerMinute: Int)
         case cache(cachePolicy: CachePolicy)
     }

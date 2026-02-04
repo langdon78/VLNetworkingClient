@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import VLDebugLogger
 
 /// A thread-safe, async/await-based network client with interceptor support.
 ///
@@ -29,7 +30,7 @@ import Foundation
 public final actor AsyncNetworkClient: AsyncNetworkClientProtocol {
     private let session: URLSessionProtocol
     private let interceptorChain: InterceptorChainProtocol
-    private let logger: Logger
+    private let logger: VLDebugLogger
     
     /// Creates a new network client with the specified session and interceptor chain.
     /// - Parameters:
@@ -38,7 +39,7 @@ public final actor AsyncNetworkClient: AsyncNetworkClientProtocol {
     public init(
         session: URLSessionProtocol = URLSession.shared,
         interceptorChain: InterceptorChain = InterceptorChain(),
-        logger: Logger = DefaultLogger()
+        logger: VLDebugLogger = VLDebugLogger.shared
     ) {
         self.session = session
         self.interceptorChain = interceptorChain
@@ -207,7 +208,7 @@ public final actor AsyncNetworkClient: AsyncNetworkClientProtocol {
         
         for attempt in 1...maxRetries {
             if attempt > 1 {
-                logger.debug("Retrying network request... Attempt \(attempt) of \(maxRetries)")
+                logger.log("Retrying network request... Attempt \(attempt) of \(maxRetries)")
             }
             do {
                 return try await operation()
