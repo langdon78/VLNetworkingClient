@@ -95,11 +95,14 @@ extension RequestConfiguration {
         request.httpMethod = method.description
         request.httpBody = body
         request.timeoutInterval = timeoutInterval
-        
+        if method != .GET {
+            request.cachePolicy = .reloadIgnoringLocalCacheData
+        }
+
         headers.forEach { key, value in
             request.addValue(value, forHTTPHeaderField: key)
         }
-        
+
         return request
     }
 }
