@@ -13,7 +13,7 @@ let package = Package(
             targets: ["VLNetworkingClient"]),
     ],
     dependencies: [
-        .package(path: "../VLDebugLogger")
+        .package(url: "https://github.com/langdon78/VLDebugLogger", .upToNextMajor(from: "0.1.0"))
     ],
     targets: [
         // Targets are the basic building blocks of a package, defining a module or a test suite.
