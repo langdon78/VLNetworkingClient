@@ -6,6 +6,9 @@
 //
 
 import Foundation
+#if canImport(FoundationNetworking)
+import FoundationNetworking
+#endif
 
 public protocol RequestBodyEncoder: Sendable {
     func encode<T>(_ value: T) throws -> Data where T : Encodable

@@ -6,6 +6,9 @@
 //
 
 import Foundation
+#if canImport(FoundationNetworking)
+import FoundationNetworking
+#endif
 import VLDebugLogger
 
 /// A thread-safe, async/await-based network client with interceptor support.

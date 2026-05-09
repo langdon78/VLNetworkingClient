@@ -6,6 +6,9 @@
 //
 
 import Foundation
+#if canImport(FoundationNetworking)
+import FoundationNetworking
+#endif
 
 extension Collection {
     func asyncReduce<Result>(initialResult: Result, _ combine: @escaping (Result, Element) async throws -> Result) async rethrows -> Result {

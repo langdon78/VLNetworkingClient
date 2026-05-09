@@ -6,6 +6,9 @@
 //
 
 import Foundation
+#if canImport(FoundationNetworking)
+import FoundationNetworking
+#endif
 
 actor RateLimitInterceptor: Interceptor {
     private let maxRequestsPerMinute: Int

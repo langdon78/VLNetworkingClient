@@ -6,6 +6,9 @@
 //
 
 import Foundation
+#if canImport(FoundationNetworking)
+import FoundationNetworking
+#endif
 
 final actor CacheInterceptor: Interceptor {
     private let cache = NSCache<NSString, CachedResponse>()

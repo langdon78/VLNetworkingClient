@@ -6,6 +6,9 @@
 //
 
 import Foundation
+#if canImport(FoundationNetworking)
+import FoundationNetworking
+#endif
 
 // MARK: - Interceptor Chain Manager
 public final actor InterceptorChain: InterceptorChainProtocol {
