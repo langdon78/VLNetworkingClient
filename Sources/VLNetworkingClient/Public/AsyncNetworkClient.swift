@@ -70,7 +70,7 @@ public final actor AsyncNetworkClient: AsyncNetworkClientProtocol {
     /// - Returns: A `NetworkResponse` containing the raw data and HTTP metadata.
     /// - Throws: `NetworkError` for transport-level failures.
     public func request(for config: RequestConfiguration) async throws -> NetworkResponse {
-        try await withRetry(config.retryCount, delay: config.retryDelay) {
+        try await withRetry(config.retryCount, delay: config.retryDelay, rateLimitRetryDelay: config.rateLimitRetryDelay) {
             try await self.performRequest(request: config.urlRequest)
         }
     }
@@ -85,7 +85,7 @@ public final actor AsyncNetworkClient: AsyncNetworkClientProtocol {
     public func downloadFile(_ config: RequestConfiguration, to destination: URL) async throws -> URL {
         let urlRequest = config.urlRequest
 
-        return try await withRetry(config.retryCount, delay: config.retryDelay) {
+        return try await withRetry(config.retryCount, delay: config.retryDelay, rateLimitRetryDelay: config.rateLimitRetryDelay) {
             let (tempURL, response) = try await self.session.download(for: urlRequest, delegate: nil)
 
             guard let httpResponse = response as? HTTPURLResponse else {
@@ -109,7 +109,7 @@ public final actor AsyncNetworkClient: AsyncNetworkClientProtocol {
     public func uploadFile(_ config: RequestConfiguration, from fileURL: URL) async throws -> NetworkResponse {
         let urlRequest = config.urlRequest
 
-        return try await withRetry(config.retryCount, delay: config.retryDelay) {
+        return try await withRetry(config.retryCount, delay: config.retryDelay, rateLimitRetryDelay: config.rateLimitRetryDelay) {
             let (data, response) = try await self.session.upload(for: urlRequest, fromFile: fileURL)
 
             guard let httpResponse = response as? HTTPURLResponse else {
@@ -163,7 +163,7 @@ public final actor AsyncNetworkClient: AsyncNetworkClientProtocol {
         case 408:
             throw NetworkError.requestTimeout
         case 429:
-            throw NetworkError.tooManyRequests
+            throw NetworkError.tooManyRequests(retryAfter: parseRetryAfter(from: response))
         case 500...599:
             throw NetworkError.serverUnavailable
         default:
@@ -171,9 +171,32 @@ public final actor AsyncNetworkClient: AsyncNetworkClientProtocol {
         }
     }
 
+    /// Parses a `Retry-After` header per RFC 7231 §7.1.3, which permits
+    /// either delta-seconds (e.g. `"120"`) or an HTTP-date
+    /// (e.g. `"Wed, 21 Oct 2015 07:28:00 GMT"`). Returns `nil` if the header
+    /// is absent or malformed — not every API sends one (Discogs doesn't).
+    private func parseRetryAfter(from response: HTTPURLResponse) -> TimeInterval? {
+        guard let value = response.value(forHTTPHeaderField: "Retry-After") else { return nil }
+
+        if let deltaSeconds = TimeInterval(value) {
+            return max(0, deltaSeconds)
+        }
+
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        formatter.timeZone = TimeZone(identifier: "GMT")
+        formatter.dateFormat = "EEE, dd MMM yyyy HH:mm:ss zzz"
+        if let date = formatter.date(from: value) {
+            return max(0, date.timeIntervalSinceNow)
+        }
+
+        return nil
+    }
+
     private func withRetry<T: Sendable>(
         _ maxRetries: Int,
         delay: TimeInterval,
+        rateLimitRetryDelay: TimeInterval,
         operation: () async throws -> T
     ) async throws -> T {
         var lastError: Error?
@@ -191,12 +214,34 @@ public final actor AsyncNetworkClient: AsyncNetworkClientProtocol {
                     throw error
                 }
 
-                let retryDelay = delay * Double(attempt)
+                let retryDelay = self.retryDelay(
+                    for: error,
+                    attempt: attempt,
+                    baseDelay: delay,
+                    rateLimitRetryDelay: rateLimitRetryDelay
+                )
                 try await Task.sleep(nanoseconds: UInt64(retryDelay * 1_000_000_000))
             }
         }
 
         throw lastError ?? NetworkError.unknown(URLError(.unknown))
+    }
+
+    /// HTTP 429 gets its own backoff, not the generic ~0.1-0.3s policy tuned
+    /// for transient blips: a real rate-limit rejection can require waiting
+    /// tens of seconds. Honors the server's own `Retry-After` if it sent
+    /// one; otherwise falls back to `rateLimitRetryDelay`, growing per
+    /// attempt like the generic backoff does.
+    private func retryDelay(
+        for error: Error,
+        attempt: Int,
+        baseDelay: TimeInterval,
+        rateLimitRetryDelay: TimeInterval
+    ) -> TimeInterval {
+        if case let NetworkError.tooManyRequests(retryAfter) = error {
+            return retryAfter ?? rateLimitRetryDelay * Double(attempt)
+        }
+        return baseDelay * Double(attempt)
     }
 
     private func shouldNotRetry(error: Error) -> Bool {

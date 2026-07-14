@@ -35,9 +35,10 @@ public struct RequestConfiguration: Sendable {
     public let timeoutInterval: TimeInterval
     public let retryCount: Int
     public let retryDelay: TimeInterval
-    
+    public let rateLimitRetryDelay: TimeInterval
+
     /// Creates a new request configuration.
-    /// 
+    ///
     /// - Parameters:
     ///   - url: The URL for the request.
     ///   - method: The HTTP method. Defaults to `.GET`.
@@ -45,7 +46,15 @@ public struct RequestConfiguration: Sendable {
     ///   - body: Request body data. Defaults to `nil`.
     ///   - timeoutInterval: Request timeout in seconds. Defaults to 30.0.
     ///   - retryCount: Number of retry attempts. Defaults to 3.
-    ///   - retryDelay: Initial delay between retries in seconds. Defaults to 0.1.
+    ///   - retryDelay: Initial delay between retries in seconds, for
+    ///     ordinary retryable errors (transient blips). Defaults to 0.1.
+    ///   - rateLimitRetryDelay: Initial delay between retries in seconds,
+    ///     specifically for HTTP 429 responses when the server didn't send
+    ///     a `Retry-After` header — deliberately much longer than
+    ///     `retryDelay`, since a real rate-limit rejection can require
+    ///     waiting tens of seconds, not milliseconds. Ignored if the server
+    ///     did send `Retry-After`; that value is honored instead. Defaults
+    ///     to 5.0.
     public init(
         url: URL,
         method: HTTPMethod = .GET,
@@ -53,7 +62,8 @@ public struct RequestConfiguration: Sendable {
         body: Data? = nil,
         timeoutInterval: TimeInterval = 30.0,
         retryCount: Int = 3,
-        retryDelay: TimeInterval = 0.1
+        retryDelay: TimeInterval = 0.1,
+        rateLimitRetryDelay: TimeInterval = 5.0
     ) {
         self.url = url
         self.method = method
@@ -62,6 +72,7 @@ public struct RequestConfiguration: Sendable {
         self.timeoutInterval = timeoutInterval
         self.retryCount = retryCount
         self.retryDelay = retryDelay
+        self.rateLimitRetryDelay = rateLimitRetryDelay
     }
     
     /// Creates a new configuration with an encoded request body.
