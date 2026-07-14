@@ -56,8 +56,13 @@ public enum NetworkError: Error, LocalizedError {
     /// Resource not found (404).
     case notFound
     
-    /// Too many requests (429).
-    case tooManyRequests
+    /// Too many requests (429). `retryAfter`, parsed from the response's
+    /// `Retry-After` header if present, is the number of seconds the server
+    /// asked the client to wait before retrying (supports both the
+    /// delta-seconds and HTTP-date forms per RFC 7231 §7.1.3). `nil` if the
+    /// server didn't send one — not every API does (Discogs, for one,
+    /// doesn't), so callers should fall back to their own default backoff.
+    case tooManyRequests(retryAfter: TimeInterval?)
     
     /// Unknown error with underlying error information.
     case unknown(Error)
@@ -84,7 +89,10 @@ public enum NetworkError: Error, LocalizedError {
             return "Forbidden access"
         case .notFound:
             return "Resource not found"
-        case .tooManyRequests:
+        case .tooManyRequests(let retryAfter):
+            if let retryAfter {
+                return "Too many requests (retry after \(retryAfter)s)"
+            }
             return "Too many requests"
         case .unknown(let error):
             return "Unknown error: \(error.localizedDescription)"
@@ -105,9 +113,10 @@ extension NetworkError: Equatable {
             (.noInternetConnection, .noInternetConnection),
             (.serverUnavailable, .serverUnavailable),
             (.unauthorized, .unauthorized),
-            (.forbidden, .forbidden),
-            (.tooManyRequests, .tooManyRequests):
+            (.forbidden, .forbidden):
             return true
+        case (.tooManyRequests(let lhsRetryAfter), .tooManyRequests(let rhsRetryAfter)):
+            return lhsRetryAfter == rhsRetryAfter
         case (.decodingError(let lhsError), .decodingError(let rhsError)):
             return String(reflecting: lhsError) == String(reflecting: rhsError)
         case (.httpError(let lhsStatusCode, let lhsData), .httpError(let rhsStatusCode, let rhsData)):
