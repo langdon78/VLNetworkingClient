@@ -74,7 +74,7 @@ public enum NetworkError: Error, LocalizedError {
         case .noData:
             return "No data received"
         case .decodingError(let error):
-            return "Decoding error: \(error.localizedDescription)"
+            return "Decoding error: \(Self.describe(decodingError: error))"
         case .httpError(let statusCode, _):
             return "HTTP error with status code: \(statusCode)"
         case .requestTimeout:
@@ -97,6 +97,42 @@ public enum NetworkError: Error, LocalizedError {
         case .unknown(let error):
             return "Unknown error: \(error.localizedDescription)"
         }
+    }
+
+    /// `DecodingError.localizedDescription` bridges to Foundation's generic,
+    /// case-agnostic NSError text (e.g. "The data couldn't be read because
+    /// it is missing.") — useless for actually finding the failing field.
+    /// `DecodingError.Context` already carries exactly that (`codingPath`,
+    /// `debugDescription`); this formats it instead of discarding it, so a
+    /// production decoding failure is diagnosable from its error message
+    /// alone rather than needing a from-scratch repro to even locate which
+    /// key broke.
+    private static func describe(decodingError error: Error) -> String {
+        guard let decodingError = error as? DecodingError else {
+            return error.localizedDescription
+        }
+        switch decodingError {
+        case .keyNotFound(let key, let context):
+            return "missing key '\(key.stringValue)' at \(path(context)) — \(context.debugDescription)"
+        case .valueNotFound(let type, let context):
+            return "null value for \(type) at \(path(context)) — \(context.debugDescription)"
+        case .typeMismatch(let type, let context):
+            return "type mismatch, expected \(type) at \(path(context)) — \(context.debugDescription)"
+        case .dataCorrupted(let context):
+            return "corrupted data at \(path(context)) — \(context.debugDescription)"
+        @unknown default:
+            return error.localizedDescription
+        }
+    }
+
+    /// Dot-joined coding path, falling back to each key's `intValue` for
+    /// array indices (`CodingKey.stringValue` is empty for those) — e.g.
+    /// `releases.12.basic_information.labels.2.catno`, not just `catno`.
+    private static func path(_ context: DecodingError.Context) -> String {
+        guard !context.codingPath.isEmpty else { return "<root>" }
+        return context.codingPath
+            .map { $0.intValue.map(String.init) ?? $0.stringValue }
+            .joined(separator: ".")
     }
 }
 
